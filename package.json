@@ -1,0 +1,10 @@
+{
+  "name": "sketch_cli",
+  "version": "0.0.0",
+  "description": "pixivsketchrec_clitools",
+  "main": "main.js",
+  "repository": "git@github.com:Winding6636/sketch_cli.git",
+  "author": "Winding with NKTN",
+  "license": "MIT",
+  "private": true
+}
