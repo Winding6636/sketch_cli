@@ -1,0 +1,6 @@
+{
+    "pixiv":{
+		"user" : "userid_mailaddress",
+		"password" : "password"
+	}
+}
