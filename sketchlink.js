@@ -72,7 +72,7 @@ function live(url){
                 process.exit(-1);
             }
             //取得項目
-            console.log (body.data);
+            //console.log (body.data);
             console.log(body.data.id) //配信ID
             console.log(body.data.created_at) //配信開始時間
             console.log(body.data.owner.user.unique_name) //ユーザー名
