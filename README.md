@@ -2,6 +2,7 @@ pixiv sketch recoder nodejs
 
     WIP:Project
 
+#####   Requires Streamlink
 
 ###### Usage
     npm start "LIVEURL"
