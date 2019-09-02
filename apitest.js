@@ -4,7 +4,8 @@ const axios = require ('axios');
 const fs = require("fs");
 const jsonfile = require('jsonfile');
 var request = require('request');
-
+const m3u8 = require('m3u8');
+const M3U8FileParser = require('m3u8-file-reader');
 
 const api = "https://sketch.pixiv.net/api/";
 const account = require('./account.json');
@@ -116,36 +117,30 @@ async function OAuth(username,password) {
     return authres.access_token
 };
 
-function lives(url){
-    console.log ("live.json");
+function live(url){
     console.log("Imput: "+url);
+    var liveid = (url.pathname.split('/').pop())
     result.then((string) => {
-    auth = "Bearer "+string
-    axios.post('https://sketch.pixiv.net/api/lives.json', null, { headers: { 
-        'Content-Type': 'application/json', 'Authorization': auth,
-        'Referer': 'https://sketch.pixiv.net/lives',
-        'X-Requested-With': 'https://sketch.pixiv.net/lives',
-        'Accept': 'application/vnd.sketch-v1+json',
-        'User-Agent': 'curl/7.65.1'
-    }} )
-        .then(res => {
-            /*
-            const items = res.data;
-            for (const item of items) {
-            console.log(`${item}:`);
-            }*/
-        }).catch(error => {
-            const {
-                status,
-                statusText
-            } = error.response;
-            console.log (error.config)
-        console.log(`Error! HTTP Status: ${status} ${statusText}`);
-      });
-    });
+    var headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer '+string };
+    var options = { url: 'https://sketch.pixiv.net/api/lives/'+liveid,  headers: headers, json: true  };
+    
+    request(options, function (error, response, body) { 
+        if (!error && response.statusCode == 200) {
+            //取得項目
+            console.log(body.data.id) //配信ID
+            console.log(body.data.created_at) //配信開始時間
+            console.log(body.data.owner.user.unique_name) //ユーザー名
+            console.log(body.data.name) //放送タイトル
+            console.log(body.data.owner.hls_movie.url) //HLSURL
+            hls_movie(body.data.owner.hls_movie.url)
+          } else if (response.statusCode ==404) {
+              console.log("放送が見つかりません。")
+          } else {console.log(response.statusCode,error)}
+        })
+    })
 };
 
-function lives2(url){
+function lives(url){
     result.then((string) => {
     var headers = {
         'Content-Type': 'application/json',
@@ -167,15 +162,36 @@ function lives2(url){
     })
 }
 
+function hls_movie(hls){
+    request(hls, function (error, response, body) {
+        if (process.argv[3] != null && process.argv[3] == "worst") { 
+                qua = 2
+            } else { qua = 1
+                const content = body;
+                const reader = new M3U8FileParser();
+                reader.read(content);
+                reader.getResult(); // Get the parse result
+                reader.reset(); // Optional, If you want to parse a new file, call reset()
+            } 
+});
+
+    //console.log(m3u8(hlsm3u8))
+}
+
 function main(){
     console.debug("main");
     result = OAuth(account.pixiv.user,account.pixiv.password);
-    result.then((string) => {    
-        if (process.argv[2]) {
-            console.log ("URL: "+process.argv[2]);
-            //lives(process.argv[2]);
-            lives2(process.argv[2]);
-        } else { console.log ("not arg URL") }
+    result.then((string) => { 
+        if (process.argv[2] != null)  {
+            urls = process.argv[2]
+            if (urls.match(/live/)) {
+                console.log ("LIVEmode")
+                urls = new URL (urls)
+                live(urls);
+            } else {
+            lives;
+            }
+        }
     });
 }
 

@@ -65,5 +65,8 @@ typings/
 
 testcode/
 memo/
+Rec/
+node-streamlink/
+m3u8/
 account.json
 secret.json
